@@ -21,7 +21,64 @@ class Plugin {
         this._waitingForBuildOnce = {};
 	}
 
-	onActionRun(options, start, end) {
+    onActionRun(options, start, end) {
+        start();
+
+        options.dest = Location.contextReplace(options.dest, options);
+
+        //see if it's possible to inject the preset locations
+         babelCore.OptionManager.prototype.mergePresets = function mergePresets(presets /*: Array<string | Object>*/, dirname /*: string*/) {
+            for (var _iterator2 = presets, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _getIterator(_iterator2);;) {
+              var _ref2;
+
+              if (_isArray2) {
+                if (_i2 >= _iterator2.length) break;
+                _ref2 = _iterator2[_i2++];
+              } else {
+                _i2 = _iterator2.next();
+                if (_i2.done) break;
+                _ref2 = _i2.value;
+              }
+
+              var val = _ref2;
+
+              if (typeof val === "string") {
+                
+                var presetLoc = path.join(__dirname, "../../../node_modules/", "babel-preset-" + val); //_helpersResolve2["default"]("babel-preset-" + val, dirname) || _helpersResolve2["default"](val, dirname);
+                console.log(presetLoc);
+                if (presetLoc) {
+                  var presetOpts = require(presetLoc);
+                  this.mergeOptions(presetOpts, presetLoc, presetLoc, _path2["default"].dirname(presetLoc));
+                } else {
+                  throw new Error("Couldn't find preset " + JSON.stringify(val) + " relative to directory " + JSON.stringify(dirname));
+                }
+              } else if (typeof val === "object") {
+                this.mergeOptions(val);
+              } else {
+                throw new Error("todo");
+              }
+            }
+          };
+
+        babelCore.transformFile("src/core/js/app.js", {
+            "env": {
+
+            },
+            "presets": [
+                "es2015"
+            ],
+            "sourceRoot": "src/"
+        }, function (err, result) {
+            console.log(err);
+            //fs.writeFileSync(options.dest, result.code);
+            end();
+        });
+
+       
+        
+    }
+
+	onActionRunOld(options, start, end) {
 		options = options || {};
 
         options.dest = Location.contextReplace(options.dest, options);

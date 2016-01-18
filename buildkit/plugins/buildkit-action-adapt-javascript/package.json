@@ -1,4 +1,8 @@
 {
 	"pluginName": "javascriptBlank",
-	"pluginMain": "js/index.js"
+	"pluginMain": "js/index.js",
+	"pluginDependencies": {
+		"babelCore": "babel-core",
+		"babelPresetES2015": "babel-preset-es2015"
+	}
 }
